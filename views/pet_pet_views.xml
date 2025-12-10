@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!-- List View -->
+        <record id="view_pet_pet_list" model="ir.ui.view">
+            <field name="name">view.pet.pet.list</field>
+            <field name="model">pet.pet</field>
+            <field name="arch" type="xml">
+                <list>
+                    <field name="name"/>
+                    <field name="species_id"/>
+                    <field name="breed_id"/>
+                    <field name="gender"/>
+                    <field name="birth_date"/>
+                    <field name="owner_id"/>
+                    <field name="age"/>
+                    <field name="weight"/>
+                    <field name="color" optional="hide"/>
+                    <field name="veterinarian_id" optional="hide"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- Form View -->
+        <record id="view_pet_pet_form" model="ir.ui.view">
+            <field name="name">view.pet.pet.form</field>
+            <field name="model">pet.pet</field>
+            <field name="arch" type="xml">
+                <form string="Pet">
+                    <sheet>
+                        <div class="d-flex gap-3 mb8">
+                            <field name="image" widget="image" options="{'preview_image': 'image', 'size': [130,130], 'img_class': 'rounded border'}"/>
+                                <div class="flex-grow-1">
+                                    <h1 class="mb-0">
+                                        <field name="name" placeholder="Name of pet" required="1"/>
+                                    </h1>
+                                    <div>
+                                        <div class="d-flex gap-3 mt-2">
+                                            <div class="d-flex align-items-center">
+                                                <i class="fa fa-birthday-cake fa-fw text-primary me-1" title="Birth Date"/>
+                                                <field name="birth_date"/>
+                                            </div>
+                                            <div class="d-flex align-items-center">
+                                                <i class="fa fa-calendar fa-fw text-primary me-1" title="Age"/>
+                                                <field name="age" readonly="1"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <group>
+                            <group>
+                                <field name="owner_id" string="Owner"/>
+                                <field name="veterinarian_id" string="Veterinarian"/>
+                            </group>
+                        </group>
+
+                        <notebook>
+                          <page string="General">
+                            <group>
+                              <field name="species_id"/>
+                              <field name="breed_id" domain="[('species_id','=', species_id)]"/>
+                              <field name="gender"/>
+                            </group>
+                          </page>
+                          <page string="Details">
+                            <group>
+                              <field name="birth_date"/>
+                              <field name="age" readonly="1"/>
+                              <field name="weight"/>
+                              <field name="color"/>
+                            </group>
+                          </page>
+                        </notebook>
+
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Kanban View -->
+        <record id="view_pet_pet_kanban" model="ir.ui.view">
+            <field name="name">view.pet.pet.kanban</field>
+            <field name="model">pet.pet</field>
+            <field name="arch" type="xml">
+                <kanban sample="1">
+
+                    <field name="image"/>
+                    <field name="name"/>
+                    <field name="species_id"/>
+                    <field name="breed_id"/>
+                    <field name="owner_id"/>
+                    <field name="age"/>
+                    <field name="gender"/>
+                    <field name="weight"/>
+                    <field name="color"/>
+                    <field name="veterinarian_id"/>
+
+                    <templates>
+                        <t t-name="card" class="flex-row">
+
+                            <aside class="o_kanban_aside_full" style="width: 100px;">
+                                <div class="position-relative w-100 h-auto m-0" style="height: 100%;">
+                                    <field name="image"
+                                           alt="Pet image"
+                                           class="h-100 w-100"
+                                           widget="image"
+                                           options="{'img_class': 'object-fit-contain'}"/>
+                                </div>
+                            </aside>
+
+                            <main class="ps-2 flex-grow-1">
+
+                                <div class="mb-2">
+                                    <field name="name" class="mb-0 fw-bold fs-5"/>
+                                </div>
+
+                                <div class="row small">
+
+                                    <div class="col-6 mb-1" t-if="record.breed_id.raw_value">
+                                        <field name="breed_id"/>
+                                    </div>
+
+                                    <div class="col-6 mb-1" t-if="record.species_id.raw_value">
+                                        <field name="species_id"/>
+                                    </div>
+
+                                    <div class="col-6 mb-1" t-if="record.gender.raw_value">
+                                        <field name="gender"/>
+                                    </div>
+
+                                    <div class="col-6 mb-1" t-if="record.age.raw_value">
+                                        <field name="age"/> Years
+                                    </div>
+
+                                    <div class="col-6 mb-1" t-if="record.weight.raw_value">
+                                        <field name="weight"/> kg
+                                    </div>
+
+                                    <div class="col-6 mb-1" t-if="record.color.raw_value">
+                                        <field name="color"/>
+                                    </div>
+
+                                </div>
+
+                                <footer class="o_kanban_footer mt-3">
+                                    <div class="d-flex flex-column">
+                                        <div t-if="record.owner_id.raw_value" class="d-flex align-items-center mb-2">
+                                            <strong class="me-2">Owner:</strong>
+                                            <field name="owner_id" options="{'no_open': True}"/>
+                                            <field name="owner_id"
+                                                   widget="many2one_avatar"
+                                                   options="{'no_open': True, 'size': 24}"
+                                                   class="ms-2"/>
+                                        </div>
+
+                                        <div t-if="record.veterinarian_id.raw_value" class="d-flex align-items-center">
+                                            <strong class="me-2">Veterinarian:</strong>
+                                            <field name="veterinarian_id" options="{'no_open': True}"/>
+                                            <field name="veterinarian_id"
+                                                   widget="many2one_avatar"
+                                                   options="{'no_open': True, 'size': 24}"
+                                                   class="ms-2"/>
+                                        </div>
+                                    </div>
+                                </footer>
+                            </main>
+
+                        </t>
+                    </templates>
+
+                </kanban>
+            </field>
+        </record>
+
+
+
+
+<!--&lt;!&ndash; Search View &ndash;&gt;-->
+<!--<record id="view_pet_pet_search" model="ir.ui.view">-->
+<!--    <field name="name">pet.pet.search</field>-->
+<!--    <field name="model">pet.pet</field>-->
+<!--    <field name="arch" type="xml">-->
+<!--        <search>-->
+<!--            <field name="name"/>-->
+<!--            <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>-->
+<!--        </search>-->
+<!--    </field>-->
+<!--</record>-->
+
+
+
+        <!-- Action -->
+        <record id="action_pet_pet" model="ir.actions.act_window">
+            <field name="name">Pet</field>
+            <field name="res_model">pet.pet</field>
+            <field name="view_mode">kanban,list,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create a new Pet
+                </p>
+            </field>
+        </record>
+    </data>
+</odoo>

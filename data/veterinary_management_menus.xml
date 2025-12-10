@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <menuitem
+        id="veterinarian_menu_root"
+        name="Veterinarian Management"
+        web_icon="veterinary_management,static/description/icon.png"
+        sequence="10"
+    />
+
+    <menuitem
+        id="menu_pet_management"
+        name="Animals"
+        parent="veterinarian_menu_root"
+        sequence="1"
+    />
+
+    <menuitem
+        id="menu_pet_species"
+        name="Species"
+        parent="menu_pet_management"
+        action="veterinary_management.action_pet_species"
+        sequence="1"
+    />
+
+    <menuitem
+        id="menu_pet_pet"
+        name="Pets"
+        parent="menu_pet_management"
+        action="veterinary_management.action_pet_pet"
+        sequence="2"
+    />
+
+
+
+    <menuitem
+        id="menu_hr_veterinarians"
+        name="Veterinarians"
+        parent="veterinarian_menu_root"
+        action="veterinary_management.action_hr_employee_veterinarians"
+        sequence="3"
+    />
+</odoo>
+

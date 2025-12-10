@@ -1,0 +1,70 @@
+<odoo>
+    <data>
+        <!-- Tree/List View -->
+        <record id="view_pet_treatment_tree" model="ir.ui.view">
+            <field name="name">pet.treatment.list</field>
+            <field name="model">pet.treatment</field>
+            <field name="arch" type="xml">
+                <list>
+                    <field name="name"/>
+                    <field name="active"/>
+                    <field name="company_id" groups="base.group_multi_company"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- Form View -->
+        <record id="view_pet_treatment_form" model="ir.ui.view">
+            <field name="name">pet.treatment.form</field>
+            <field name="model">pet.treatment</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="active"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Kanban View -->
+        <record id="view_pet_treatment_kanban" model="ir.ui.view">
+            <field name="name">pet.treatment.kanban</field>
+            <field name="model">pet.treatment</field>
+            <field name="arch" type="xml">
+                <kanban>
+                    <field name="name"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="oe_kanban_global_click">
+                                <div class="oe_kanban_details">
+                                    <strong><field name="name"/></strong>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <!-- Action -->
+        <record id="action_pet_treatment" model="ir.actions.act_window">
+            <field name="name"></field>
+            <field name="res_model">pet.treatment</field>
+            <field name="view_mode">list,form,kanban</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create a new 
+                </p>
+            </field>
+        </record>
+
+        <!-- Menu -->
+        <menuitem id="menu_pet_treatment"
+                  name="Treatments"
+                  action="action_pet_treatment"/>
+    </data>
+</odoo>

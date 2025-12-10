@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!-- List View -->
+        <record id="view_pet_species_list" model="ir.ui.view">
+            <field name="name">view.pet.species.list</field>
+            <field name="model">pet.species</field>
+            <field name="arch" type="xml">
+                <list>
+                    <field name="name"/>
+                    <field name="description"/>
+                    <field name="active" invisible="1"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- Form View -->
+        <record id="view_pet_species_form" model="ir.ui.view">
+            <field name="name">view.pet.species.form</field>
+            <field name="model">pet.species</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                        <group>
+                          <field name="name"/>
+                          <field name="description"/>
+                        </group>
+                        <notebook>
+                            <page string="Breeds">
+                                <field name="breeds_ids">
+                                    <list editable="bottom">
+                                        <field name="name"/>
+                                        <field name="description"/>
+                                    </list>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Action -->
+        <record id="action_pet_species" model="ir.actions.act_window">
+            <field name="name">Species</field>
+            <field name="res_model">pet.species</field>
+            <field name="view_mode">list,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create a new Pet Species
+                </p>
+            </field>
+        </record>
+
+  </data>
+</odoo>
