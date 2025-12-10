@@ -1,3 +1,8 @@
+# Veterinary Management Module for Odoo
+# © 2025 Gerardo Alí Ferraro Schelijasch
+# License OPL-1 (Odoo Proprietary License v1.0)
+# www.soltecferr.com
+
 {
     'name': 'Veterinary Management',
     'version': '19.0.1.0.0',
