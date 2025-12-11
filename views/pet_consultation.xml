@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_pet_consultation_calendar" model="ir.ui.view">
+            <field name="name">pet.consultation.calendar</field>
+            <field name="model">pet.consultation</field>
+            <field name="arch" type="xml">
+                <calendar string="Pet Consultations" date_start="appointment_date" color="status">
+                    <field name="pet_id"/>
+                    <field name="veterinarian_id"/>
+                    <field name="status"/>
+                </calendar>
+            </field>
+        </record>
+
+        <record id="action_pet_consultation_calendar" model="ir.actions.act_window">
+            <field name="name">Pet Consultations Calendar</field>
+            <field name="res_model">pet.consultation</field>
+            <field name="view_mode">calendar,list,form</field>
+            <field name="view_id" ref="view_pet_consultation_calendar"/>
+        </record>
+
+
+    </data>
+</odoo>
