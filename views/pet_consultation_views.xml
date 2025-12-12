@@ -1,70 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <!-- Tree/List View -->
-        <record id="view_pet_consultation_tree" model="ir.ui.view">
-            <field name="name">pet.consultation.list</field>
+        <record id="view_pet_consultation_calendar" model="ir.ui.view">
+            <field name="name">pet.consultation.calendar</field>
             <field name="model">pet.consultation</field>
             <field name="arch" type="xml">
-                <list>
+                <calendar string="Pet Consultations" date_start="date" color="state">
+                    <field name="reference"/>
                     <field name="name"/>
-                    <field name="active"/>
-                    <field name="company_id" groups="base.group_multi_company"/>
-                </list>
+                    <field name="pet_id"/>
+                    <field name="veterinarian_id"/>
+                    <field name="state"/>
+                </calendar>
             </field>
         </record>
 
-        <!-- Form View -->
         <record id="view_pet_consultation_form" model="ir.ui.view">
             <field name="name">pet.consultation.form</field>
             <field name="model">pet.consultation</field>
             <field name="arch" type="xml">
-                <form>
+                <form string="Pet Consultation">
                     <sheet>
                         <group>
+                            <field name="reference"/>
                             <field name="name"/>
-                            <field name="active"/>
-                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="date"/>
+                            <field name="pet_id"/>
+                            <field name="veterinarian_id"/>
                         </group>
+                        <notebook>
+                            <page string="Treatments">
+                                <field name="treatment_ids">
+                                    <list editable="bottom">
+                                        <field name="product_id"/>
+                                        <field name="quantity"/>
+                                        <field name="unit_price"/>
+                                        <field name="subtotal" readonly="1"/>
+                                    </list>
+                                </field>
+                            </page>
+                        </notebook>
                     </sheet>
                 </form>
             </field>
         </record>
 
-        <!-- Kanban View -->
-        <record id="view_pet_consultation_kanban" model="ir.ui.view">
-            <field name="name">pet.consultation.kanban</field>
-            <field name="model">pet.consultation</field>
-            <field name="arch" type="xml">
-                <kanban>
-                    <field name="name"/>
-                    <templates>
-                        <t t-name="kanban-box">
-                            <div class="oe_kanban_global_click">
-                                <div class="oe_kanban_details">
-                                    <strong><field name="name"/></strong>
-                                </div>
-                            </div>
-                        </t>
-                    </templates>
-                </kanban>
-            </field>
-        </record>
-
-        <!-- Action -->
         <record id="action_pet_consultation" model="ir.actions.act_window">
-            <field name="name"></field>
+            <field name="name">Pet Consultations Calendar</field>
             <field name="res_model">pet.consultation</field>
-            <field name="view_mode">list,form,kanban</field>
-            <field name="help" type="html">
-                <p class="o_view_nocontent_smiling_face">
-                    Create a new 
-                </p>
-            </field>
+            <field name="view_mode">calendar,list,form</field>
+            <field name="view_id" ref="view_pet_consultation_calendar"/>
         </record>
 
-        <!-- Menu -->
-        <menuitem id="menu_pet_consultation"
-                  name="Consultation"
-                  action="action_pet_consultation"/>
+
     </data>
 </odoo>

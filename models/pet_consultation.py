@@ -12,6 +12,12 @@ class PetConsultation(models.Model):
         help='Name of the consultation type, e.g., General Checkup, Vaccination, Surgery'
     )
 
+    reference = fields.Char(
+        string='Reference',
+        required=True,
+        help='Unique reference code for the consultation'
+    )
+
     pet_id = fields.Many2one(
         comodel_name='pet.pet',
         string='Pet',
@@ -19,7 +25,7 @@ class PetConsultation(models.Model):
         help='The pet for which the consultation is scheduled'
     )
 
-    veterinary_id = fields.Many2one(
+    veterinarian_id = fields.Many2one(
         comodel_name='hr.employee',
         string='Veterinarian',
         domain=[('is_veterinarian', '=', True)],
@@ -60,11 +66,11 @@ class PetConsultation(models.Model):
         help='Additional notes or observations from the consultation'
     )
 
-    product_ids = fields.Many2many(
-        comodel_name='product.product',
-        string='Products/Services',
-        help='Products or services provided during the consultation'
+    active = fields.Boolean(
+        default=True,
+        help='Indicates whether the consultation record is active'
     )
+
 
     treatment_ids = fields.One2many(
         comodel_name='pet.treatment',
@@ -73,20 +79,15 @@ class PetConsultation(models.Model):
         help='List of treatments administered during the consultation'
     )
 
-    invoice_id = fields.Many2one(
-        comodel_name='account.move',
-        string='Invoice',
-        help='Invoice associated with the consultation'
-    )
 
     @api.constrains('date', 'veterinary_id')
     def _check_date(self):
         for rec in self:
             if rec.date and rec.date < fields.Datetime.now():
                 raise ValidationError(_('The consultation date cannot be in the past.'))
-            if rec.veterinary_id and rec.duration:
+            if rec.veterinarian_id and rec.duration:
                 overlapping = self.search([
-                    ('veterinary_id', '=', rec.veterinary_id.id),
+                    ('veterinarian_id', '=', rec.veterinarian_id.id),
                     ('id', '!=', rec.id),
                     ('state', '!=', 'canceled'),
                     ('date', '<', rec.date + timedelta(hours=rec.duration)),
@@ -117,6 +118,15 @@ class PetConsultation(models.Model):
         'CHECK(duration > 0)',
         'The duration must be greater than zero.'
     )
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if 'reference' not in vals or not vals['reference']:
+                vals['reference'] = self.env['ir.sequence'].next_by_code('pet.consultation') or _('New') # type: ignore[attr-defined]
+        records = super(PetConsultation, self).create(vals_list)
+        return records
+
 
 
 

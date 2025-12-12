@@ -24,6 +24,7 @@
         'security/ir.model.access.csv',
 
         # Views
+        'views/pet_consultation_views.xml',
         'views/pet_pet_views.xml',
         'views/pet_species_views.xml',
         'views/hr_employee_views.xml',

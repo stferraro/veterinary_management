@@ -11,32 +11,19 @@ class PetTreatment(models.Model):
         help='Name of the treatment or procedure, e.g., Vaccination, Surgery, Deworming'
     )
 
-    pet_id = fields.Many2one(
-        comodel_name='pet.pet',
-        string='Pet',
-        required=True,
-        help='The pet receiving the treatment'
-    )
-
     consultation_id = fields.Many2one(
         comodel_name='pet.consultation',
         string='Consultation',
         required=True,
-        help='The consultation during which the treatment was administered'
+        ondelete='cascade',
+        help='Consultation this treatment belongs to'
     )
 
-    products_ids = fields.Many2many(
-        comodel_name='product.product',
-        string='Products/Medications',
-        help='Products or medications used during the treatment'
-    )
-
-    veterinary_id = fields.Many2one(
-        comodel_name='hr.employee',
-        string='Veterinarian',
-        domain=[('is_veterinarian', '=', True)],
-        required=True,
-        help='The veterinarian administering the treatment'
+    product_id = fields.Many2one(
+        comodel_name='product.template',
+        string='Product',
+        domain=[('type', 'in', ['veterinarian_service', 'veterinarian_medicament'])],
+        help='Product used in this treatment'
     )
 
     start_date = fields.Datetime(
@@ -48,9 +35,33 @@ class PetTreatment(models.Model):
         help='End date and time of the treatment'
     )
 
-    notes = fields.Text(
-        help='Additional notes or observations about the treatment'
+    currency_id = fields.Many2one(
+        'res.currency',
+        default=lambda self: self.env.company.currency_id,
+        string='Currency'
     )
+
+    quantity = fields.Float(
+        default=1.0,
+        help='Quantity of the product used in this treatment'
+    )
+
+    unit_price = fields.Float(
+        string='Unit Price',
+        related='product_id.list_price',
+        help='Unit price of the product used in this treatment'
+    )
+
+    subtotal = fields.Monetary(
+        string='Subtotal',
+        compute='_compute_subtotal',
+        store=True
+    )
+
+    @api.depends('product_id')
+    def _compute_subtotal(self):
+        for rec in self:
+            rec.subtotal = rec.unit_price * rec.quantity if rec.product_id else 0.0
 
     @api.constrains('start_date', 'end_date')
     def _check_dates(self):
@@ -63,6 +74,8 @@ class PetTreatment(models.Model):
         for rec in self:
             if rec.start_date and rec.start_date < fields.Datetime.now():
                 raise ValidationError(_('The start date cannot be in the past.'))
+
+
 
 
 

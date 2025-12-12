@@ -1,3 +1,6 @@
+from . import pet_treatment
+from . import product_template
+from . import pet_consultation
 from . import pet_veterinarian
 from . import pet_species
 from . import pet_breed

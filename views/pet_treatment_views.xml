@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <data>
         <!-- Tree/List View -->
@@ -62,9 +63,5 @@
             </field>
         </record>
 
-        <!-- Menu -->
-        <menuitem id="menu_pet_treatment"
-                  name="Treatments"
-                  action="action_pet_treatment"/>
     </data>
 </odoo>
