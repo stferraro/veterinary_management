@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
+
         <record id="view_pet_consultation_calendar" model="ir.ui.view">
-            <field name="name">pet.consultation.calendar</field>
+            <field name="name">view.pet.consultation.calendar</field>
             <field name="model">pet.consultation</field>
             <field name="arch" type="xml">
-                <calendar string="Pet Consultations" date_start="date" color="state">
+                <calendar string="Veterinary Appointment" date_start="date" color="state">
                     <field name="reference"/>
-                    <field name="name"/>
                     <field name="pet_id"/>
                     <field name="veterinarian_id"/>
                     <field name="state"/>
@@ -19,39 +19,102 @@
             <field name="name">pet.consultation.form</field>
             <field name="model">pet.consultation</field>
             <field name="arch" type="xml">
-                <form string="Pet Consultation">
-                    <sheet>
-                        <group>
-                            <field name="reference"/>
-                            <field name="name"/>
-                            <field name="date"/>
-                            <field name="pet_id"/>
-                            <field name="veterinarian_id"/>
-                        </group>
-                        <notebook>
-                            <page string="Treatments">
-                                <field name="treatment_ids">
-                                    <list editable="bottom">
-                                        <field name="product_id"/>
-                                        <field name="quantity"/>
-                                        <field name="unit_price"/>
-                                        <field name="subtotal" readonly="1"/>
-                                    </list>
-                                </field>
-                            </page>
-                        </notebook>
-                    </sheet>
+                <form string="Vet">
+                   <header>
+
+                       <button
+                               name="action_create_invoice"
+                               string="Create Invoice"
+                               type="object"
+                               class="btn-primary"
+                               invisible="state != 'completed'"
+                       />
+
+                       <button
+                               name="action_mark_completed"
+                               string="Mark as Completed"
+                               type="object"
+                               class="btn-success"
+                               invisible="state != 'scheduled'"
+                       />
+
+                       <button
+                               name="action_cancel"
+                               string="Cancel Appointment"
+                               type="object"
+                               class="btn-danger"
+                               invisible="state in ('completed','canceled')"
+                       />
+
+                       <field
+                               name="state"
+                               widget="statusbar"
+                               statusbar_visible="scheduled,completed,canceled"
+                       />
+
+                       <widget
+                               name="web_ribbon"
+                               title="Archived"
+                               bg_color="text-bg-danger"
+                               invisible="active"
+                       />
+
+                   </header>
+                       <sheet>
+                           <h1>
+                               <field name="reference"/>
+                           </h1>
+                           <group>
+                               <group>
+                                   <field name="pet_id" class="o_inline"/>
+                                   <field name="owner_id" class="o_inline"/>
+                                   <field name="veterinarian_id" class="o_inline"/>
+                               </group>
+                               <group>
+                                   <field name="date" class="o_inline"/>
+                                   <field name="duration" class="o_inline"/>
+                                   <field name="currency_id" class="o_inline"/>
+                               </group>
+                           </group>
+
+                           <notebook>
+                               <page string="Treatments">
+                                   <field name="treatment_ids">
+                                       <list editable="bottom">
+                                           <field name="product_id"/>
+                                           <field name="start_date"/>
+                                           <field name="end_date"/>
+                                           <field name="quantity"/>
+                                           <field name="unit_price"/>
+                                           <field name="tax_ids"/>
+                                           <field name="subtotal" readonly="1"/>
+                                       </list>
+                                   </field>
+                               </page>
+                           </notebook>
+
+                           <group class="oe_subtotal_footer oe_right" col="2">
+                               <field name="subtotal" readonly="1"/>
+                               <field name="tax_amount" readonly="1"/>
+                               <field name="total" readonly="1"/>
+                           </group>
+
+                           <group>
+                                <field name="notes" placeholder="Add observations or notes about the consultation..."/>
+                            </group>
+                       </sheet>
+
+                    <chatter reload_on_attachment="True"/>
+
                 </form>
             </field>
         </record>
 
         <record id="action_pet_consultation" model="ir.actions.act_window">
-            <field name="name">Pet Consultations Calendar</field>
+            <field name="name">Veterinary Appointment Schedule</field>
             <field name="res_model">pet.consultation</field>
             <field name="view_mode">calendar,list,form</field>
             <field name="view_id" ref="view_pet_consultation_calendar"/>
         </record>
-
-
     </data>
 </odoo>

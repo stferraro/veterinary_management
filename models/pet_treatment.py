@@ -6,11 +6,6 @@ class PetTreatment(models.Model):
     _name = 'pet.treatment'
     _description = 'The treatment or procedure for pets'
 
-    name = fields.Char(
-        required=True,
-        help='Name of the treatment or procedure, e.g., Vaccination, Surgery, Deworming'
-    )
-
     consultation_id = fields.Many2one(
         comodel_name='pet.consultation',
         string='Consultation',
@@ -52,16 +47,32 @@ class PetTreatment(models.Model):
         help='Unit price of the product used in this treatment'
     )
 
+    tax_ids = fields.Many2one(
+        comodel_name='account.tax',
+        string='Tax',
+        help='Tax applied to this treatment'
+    )
+
     subtotal = fields.Monetary(
         string='Subtotal',
         compute='_compute_subtotal',
         store=True
     )
 
-    @api.depends('product_id')
+    @api.depends('product_id', 'unit_price', 'quantity', 'tax_ids', 'currency_id')
     def _compute_subtotal(self):
         for rec in self:
-            rec.subtotal = rec.unit_price * rec.quantity if rec.product_id else 0.0
+            if not rec.product_id or not rec.unit_price or not rec.quantity:
+                rec.subtotal = 0.0
+                continue
+            price = rec.unit_price or 0.0
+            qty = rec.quantity or 0.0
+            if rec.tax_ids:
+                vals = rec.tax_ids.compute_all(price_unit=price, currency=rec.currency_id, quantity=qty,
+                                           product=rec.product_id, partner=None)
+                rec.subtotal = vals.get('total_excluded', price * qty)
+            else:
+                rec.subtotal = price * qty
 
     @api.constrains('start_date', 'end_date')
     def _check_dates(self):

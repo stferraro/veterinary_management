@@ -23,6 +23,9 @@
         # Security
         'security/ir.model.access.csv',
 
+        # sequences
+        'data/sequence_consultation.xml',
+
         # Views
         'views/pet_consultation_views.xml',
         'views/pet_pet_views.xml',
