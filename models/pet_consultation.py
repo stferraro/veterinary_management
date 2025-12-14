@@ -6,28 +6,26 @@ from datetime import timedelta
 class PetConsultation(models.Model):
     _name = 'pet.consultation'
     _inherit = ['mail.thread', 'mail.activity.mixin']
-    _description = 'The consultation types for pets (e.g., General Checkup, Vaccination, Surgery)'
+    _description = 'The consultation types for pets'
 
     name = fields.Char(
         string='Name',
         compute='_compute_name',
         store=True,
-        help='Name of the consultation, typically the reference and pet name'
+        help='Name of the consultation'
     )
 
     reference = fields.Char(
         string='Consultation',
         readonly=True,
         default=lambda self: _('New'),
-        required=True,
-        help='Unique reference code for the consultation'
+        required=True
     )
 
     pet_id = fields.Many2one(
         comodel_name='pet.pet',
         string='Pet',
         required=True,
-        help='The pet for which the consultation is scheduled',
         tracking=True
     )
 
@@ -36,7 +34,6 @@ class PetConsultation(models.Model):
         string='Veterinarian',
         domain=[('is_veterinarian', '=', True)],
         required=True,
-        help='The veterinarian conducting the consultation',
         tracking=True
     )
 
@@ -45,19 +42,11 @@ class PetConsultation(models.Model):
         string='Owner',
         related='pet_id.owner_id',
         store=True,
-        readonly=True,
-        help='The owner of the pet'
+        readonly=True
     )
 
-    date = fields.Datetime(
-        required=True,
-        help='Date and time of the consultation',
-        tracking=True
-    )
-
-    duration = fields.Float(
-        help='Duration of the consultation in hours'
-    )
+    date = fields.Datetime(required=True, tracking=True)
+    duration = fields.Float(help='Duration in hours')
 
     state = fields.Selection(
         selection=[
@@ -66,108 +55,40 @@ class PetConsultation(models.Model):
             ('canceled', 'Canceled')
         ],
         default='scheduled',
-        required=True,
-        help='Status of the consultation',
         tracking=True
     )
 
-    notes = fields.Text(
-        help='Additional notes or observations from the consultation'
-    )
-
-    active = fields.Boolean(
-        default=True,
-        help='Indicates whether the consultation record is active'
-    )
+    notes = fields.Text()
+    active = fields.Boolean(default=True)
 
     treatment_ids = fields.One2many(
         comodel_name='pet.treatment',
         inverse_name='consultation_id',
-        string='Treatments',
-        help='List of treatments administered during the consultation'
+        string='Treatments'
     )
 
     subtotal = fields.Monetary(
         compute='_compute_subtotal',
-        store=True,
-        help='Subtotal cost of the consultation before tax',
-        tracking=True
-    )
-
-    tax_ids = fields.Many2many(
-        comodel_name='account.tax',
-        string='Taxes',
-        help='Taxes applied to the consultation'
+        store=True
     )
 
     tax_amount = fields.Monetary(
-        string='Tax Amount',
         compute='_compute_amounts',
-        store=True,
-        help='Total tax amount applied to the consultation',
-        tracking=True
+        store=True
     )
 
     total = fields.Monetary(
-        string='Total Cost',
         compute='_compute_amounts',
-        store=True,
-        help='Total cost of the consultation including all treatments',
-        tracking=True
+        store=True
     )
 
     currency_id = fields.Many2one(
         'res.currency',
-        default=lambda self: self.env.company.currency_id,
-        string='Currency'
+        default=lambda self: self.env.company.currency_id
     )
-
     invoice_id = fields.Many2one(
-        comodel_name='account.move',
-        string='Invoice',
-        help='Invoice generated for this consultation'
-    )
-
-    # -------------------
-    # CONSTRAINTS
-    # -------------------
-    @api.constrains('date', 'veterinarian_id')
-    def _check_date(self):
-        for rec in self:
-            if rec.date and rec.date < fields.Datetime.now():
-                raise ValidationError(_('The consultation date cannot be in the past.'))
-            if rec.veterinarian_id and rec.duration:
-                overlapping = self.search([
-                    ('veterinarian_id', '=', rec.veterinarian_id.id),
-                    ('id', '!=', rec.id),
-                    ('state', '!=', 'canceled'),
-                    ('date', '<', rec.date + timedelta(hours=rec.duration)),
-                    ('date', '>=', rec.date)
-                ])
-                if overlapping:
-                    raise ValidationError(_('The veterinarian already has a consultation scheduled at this time.'))
-
-    @api.constrains('duration')
-    def _check_duration(self):
-        for rec in self:
-            if rec.duration and rec.duration <= 0:
-                raise ValidationError(_('The consultation duration must be greater than zero.'))
-
-    @api.constrains('product_ids')
-    def _check_products_active(self):
-        for rec in self:
-            inactive_products = rec.product_ids.filtered(lambda p: not p.active)
-            if inactive_products:
-                raise ValidationError(_('Some products in this consultation are inactive.'))
-
-    _pet_date_unique = models.Constraint(
-        'UNIQUE(pet_id, date)',
-        'A pet cannot have two consultations at the same date and time.'
-    )
-
-    _duration_positive = models.Constraint(
-        'CHECK(duration > 0)',
-        'The duration must be greater than zero.'
+        'account.move',
+        string='Invoice'
     )
 
     # -------------------
@@ -203,18 +124,7 @@ class PetConsultation(models.Model):
             rec.total = subtotal + tax_amount
 
     # -------------------
-    # OVERRIDES
-    # -------------------
-    @api.model_create_multi
-    def create(self, vals_list):
-        for vals in vals_list:
-            if 'reference' not in vals or not vals['reference']:
-                vals['reference'] = self.env['ir.sequence'].next_by_code('pet.consultation') or _('New')
-        records = super(PetConsultation, self).create(vals_list)
-        return records
-
-    # -------------------
-    # STATE CHANGE HELPER
+    # STATE ACTIONS
     # -------------------
     def action_set_state(self, new_state):
         for rec in self:
@@ -225,10 +135,6 @@ class PetConsultation(models.Model):
                 subject="State Change"
             )
 
-    # -------------------
-    # STATE CHANGE ACTIONS
-    # -------------------
-
     def action_mark_completed(self):
         self.action_set_state('completed')
 
@@ -238,20 +144,19 @@ class PetConsultation(models.Model):
     # -------------------
     # CREATE INVOICE
     # -------------------
-
     def action_create_invoice(self):
         self.ensure_one()
-        if self.state != 'completed':
-            raise ValidationError(_('Only completed consultations can be invoiced.'))
+        if self.state == 'canceled':
+            raise ValidationError(_('Cannot invoice a canceled consultation.'))
 
         invoice_lines = []
-        for treatment in self.treatment_ids:
+        for treatment in self.treatment_ids.filtered(lambda t: t.product_id):
             line_vals = {
                 'name': f"Consultation: {self.reference}",
-                'product_id': treatment.product_id.id if treatment.product_id else False,
+                'product_id': treatment.product_id.product_variant_id.id,
                 'quantity': treatment.quantity or 1.0,
                 'price_unit': treatment.unit_price or 0.0,
-                'tax_ids': [(6, 0, [treatment.tax_ids.id])] if treatment.tax_ids else [],
+                'tax_ids': [(6, 0, treatment.tax_ids.ids)] if treatment.tax_ids else [],
             }
             invoice_lines.append((0, 0, line_vals))
 
@@ -261,27 +166,23 @@ class PetConsultation(models.Model):
             'invoice_date': fields.Date.today(),
             'invoice_line_ids': invoice_lines,
             'currency_id': self.currency_id.id,
-            'ref': self.reference,
             'invoice_origin': f"Consultation {self.reference}",
         }
-
         invoice = self.env['account.move'].create(invoice_vals)
 
         self.invoice_id = invoice.id
-
+        if self.state == 'scheduled':
+            self.state = 'completed'  # marcar automáticamente completada
         self.message_post(
             body=f"Invoice {invoice.name} created for this consultation.",
             subject="Invoice Creation"
         )
 
-        return invoice
-
-
-
-
-
-
-
-
-
-
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Invoice'),
+            'res_model': 'account.move',
+            'res_id': invoice.id,
+            'view_mode': 'form',
+            'target': 'current',
+        }

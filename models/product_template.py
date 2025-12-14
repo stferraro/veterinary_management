@@ -1,8 +1,8 @@
 from odoo import fields, models, api
 
 
-class ProductProduct(models.Model):
-    _inherit = 'product.product'
+class ProductTemplate(models.Model):
+    _inherit = 'product.template'
 
     type = fields.Selection(
         selection_add=[

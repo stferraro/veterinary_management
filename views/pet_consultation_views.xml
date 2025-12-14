@@ -87,7 +87,7 @@
                                            <field name="end_date"/>
                                            <field name="quantity"/>
                                            <field name="unit_price"/>
-                                           <field name="tax_ids"/>
+                                           <field name="tax_ids" widget="many2many_tags"/>
                                            <field name="subtotal" readonly="1"/>
                                        </list>
                                    </field>
