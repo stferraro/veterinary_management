@@ -15,7 +15,7 @@ class PetTreatment(models.Model):
     )
 
     product_id = fields.Many2one(
-        comodel_name='product.template',
+        comodel_name='product.product',
         string='Product',
         domain=[('type', 'in', ['veterinarian_service', 'veterinarian_medicament'])],
         help='Product used in this treatment'
@@ -57,6 +57,11 @@ class PetTreatment(models.Model):
         string='Subtotal',
         compute='_compute_subtotal',
         store=True
+    )
+
+    sequence = fields.Integer(
+        default=1,
+        help='Sequence for ordering treatments within a consultation'
     )
 
     @api.depends('product_id', 'unit_price', 'quantity', 'tax_ids', 'currency_id')

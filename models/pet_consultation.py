@@ -122,6 +122,12 @@ class PetConsultation(models.Model):
         string='Currency'
     )
 
+    invoice_id = fields.Many2one(
+        comodel_name='account.move',
+        string='Invoice',
+        help='Invoice generated for this consultation'
+    )
+
     # -------------------
     # CONSTRAINTS
     # -------------------
@@ -229,20 +235,48 @@ class PetConsultation(models.Model):
     def action_cancel(self):
         self.action_set_state('canceled')
 
+    # -------------------
+    # CREATE INVOICE
+    # -------------------
+
     def action_create_invoice(self):
-        for rec in self:
-            for treatment in rec.treatment_ids:
-                if treatment.product_id and treatment.quantity > 0:
-                    move_vals = {
-                        'product_id': treatment.product_id.id,
-                        'product_uom_qty': treatment.quantity,
-                        'product_uom': treatment.product_id.uom_id.id,
-                        'location_id': self.env.ref('stock.stock_location_stock').id,
-                        'location_dest_id': self.env.ref('stock.stock_location_customers').id,
-                        'name': f'Treatment for {rec.pet_id.name} - {treatment.product_id.name}',
-                    }
-                    self.env['stock.move'].create(move_vals).action_confirm().action_done()
-        rec.message_post(body="Stock moves created for treatments.", subject="Stock Move Creation")
+        self.ensure_one()
+        if self.state != 'completed':
+            raise ValidationError(_('Only completed consultations can be invoiced.'))
+
+        invoice_lines = []
+        for treatment in self.treatment_ids:
+            line_vals = {
+                'name': f"Consultation: {self.reference}",
+                'product_id': treatment.product_id.id if treatment.product_id else False,
+                'quantity': treatment.quantity or 1.0,
+                'price_unit': treatment.unit_price or 0.0,
+                'tax_ids': [(6, 0, [treatment.tax_ids.id])] if treatment.tax_ids else [],
+            }
+            invoice_lines.append((0, 0, line_vals))
+
+        invoice_vals = {
+            'move_type': 'out_invoice',
+            'partner_id': self.owner_id.id,
+            'invoice_date': fields.Date.today(),
+            'invoice_line_ids': invoice_lines,
+            'currency_id': self.currency_id.id,
+            'ref': self.reference,
+            'invoice_origin': f"Consultation {self.reference}",
+        }
+
+        invoice = self.env['account.move'].create(invoice_vals)
+
+        self.invoice_id = invoice.id
+
+        self.message_post(
+            body=f"Invoice {invoice.name} created for this consultation.",
+            subject="Invoice Creation"
+        )
+
+        return invoice
+
+
 
 
 
