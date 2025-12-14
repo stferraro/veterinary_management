@@ -27,7 +27,7 @@
                                string="Create Invoice"
                                type="object"
                                class="btn-primary"
-                               invisible="state != 'completed'"
+                               invisible="state != 'completed' or invoice_id"
                        />
 
                        <button

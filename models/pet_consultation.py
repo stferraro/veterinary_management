@@ -163,6 +163,8 @@ class PetConsultation(models.Model):
         invoice_vals = {
             'move_type': 'out_invoice',
             'partner_id': self.owner_id.id,
+            'pet_consultation_id': self.id,
+            'pet_id': self.pet_id.id,
             'invoice_date': fields.Date.today(),
             'invoice_line_ids': invoice_lines,
             'currency_id': self.currency_id.id,
@@ -172,7 +174,7 @@ class PetConsultation(models.Model):
 
         self.invoice_id = invoice.id
         if self.state == 'scheduled':
-            self.state = 'completed'  # marcar automáticamente completada
+            self.state = 'completed'
         self.message_post(
             body=f"Invoice {invoice.name} created for this consultation.",
             subject="Invoice Creation"
