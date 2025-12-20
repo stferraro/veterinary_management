@@ -15,11 +15,12 @@ class PetConsultation(models.Model):
         help='Name of the consultation'
     )
 
-    reference = fields.Char(
-        string='Consultation',
+    consultation_ref = fields.Char(
         readonly=True,
+        copy=False,
         default=lambda self: _('New'),
-        required=True
+        required=True,
+        states={'scheduled': [('readonly', False)]}
     )
 
     pet_id = fields.Many2one(
@@ -92,12 +93,58 @@ class PetConsultation(models.Model):
     )
 
     # -------------------
+    # CONSTRAINTS
+    # -------------------
+
+    @api.constrains('date', 'state')
+    def _check_date(self):
+        for rec in self:
+            if rec.state == 'scheduled' and rec.date and rec.date < fields.Datetime.now():
+                raise ValidationError(
+                    _('Scheduled consultations cannot have a past date.')
+                )
+
+    @api.constrains('duration')
+    def _check_duration(self):
+        for rec in self:
+            if rec.duration is not None and rec.duration <= 0:
+                raise ValidationError(
+                    _('Consultation duration must be greater than zero.')
+                )
+
+    @api.constrains('state', 'treatment_ids')
+    def _check_completed_has_treatments(self):
+        for rec in self:
+            if rec.state == 'completed' and not rec.treatment_ids:
+                raise ValidationError(
+                    _('You cannot complete a consultation without treatments.')
+                )
+
+    @api.constrains('state', 'veterinarian_id')
+    def _check_veterinarian_required(self):
+        for rec in self:
+            if rec.state == 'completed' and not rec.veterinarian_id:
+                raise ValidationError(
+                    _('A veterinarian is required to complete the consultation.')
+                )
+
+    # -------------------
+    # OVERRIDES
+    # -------------------
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if 'consultation_ref' not in vals or not vals['consultation_ref']:
+                vals['consultation_ref'] = self.env['ir.sequence'].next_by_code('pet.consultation') or _('New')
+        return super(PetConsultation, self).create(vals_list)
+
+    # -------------------
     # COMPUTE METHODS
     # -------------------
-    @api.depends('reference', 'pet_id')
+    @api.depends('consultation_ref', 'pet_id')
     def _compute_name(self):
         for rec in self:
-            rec.name = f"{rec.reference} - {rec.pet_id.name}" if rec.pet_id else rec.reference
+            rec.name = f"{rec.consultation_ref} - {rec.pet_id.name}" if rec.pet_id else rec.consultation_ref
 
     @api.depends('treatment_ids.subtotal')
     def _compute_subtotal(self):
@@ -146,19 +193,35 @@ class PetConsultation(models.Model):
     # -------------------
     def action_create_invoice(self):
         self.ensure_one()
-        if self.state == 'canceled':
-            raise ValidationError(_('Cannot invoice a canceled consultation.'))
 
+        if self.state == 'canceled':
+            raise ValidationError(
+                _('Cannot invoice a canceled consultation.')
+            )
+
+        if self.invoice_id:
+            raise ValidationError(
+                _('This consultation has already been invoiced.')
+            )
+
+        if not self.owner_id:
+            raise ValidationError(
+                _('The pet must have an owner to create an invoice.')
+            )
+        treatments = self.treatment_ids.filtered(lambda t: t.product_id)
+        if not treatments:
+            raise ValidationError(
+                _('You must add at least one treatment with a product to invoice.')
+            )
         invoice_lines = []
-        for treatment in self.treatment_ids.filtered(lambda t: t.product_id):
-            line_vals = {
-                'name': f"Consultation: {self.reference}",
-                'product_id': treatment.product_id.product_variant_id.id,
+        for treatment in treatments:
+            invoice_lines.append((0, 0, {
+                'name': f"{treatment.product_id.name} (Consultation: {self.consultation_ref})",
+                'product_id': treatment.product_id.id,
                 'quantity': treatment.quantity or 1.0,
                 'price_unit': treatment.unit_price or 0.0,
-                'tax_ids': [(6, 0, treatment.tax_ids.ids)] if treatment.tax_ids else [],
-            }
-            invoice_lines.append((0, 0, line_vals))
+                'tax_ids': [(6, 0, treatment.tax_ids.ids)],
+            }))
 
         invoice_vals = {
             'move_type': 'out_invoice',
@@ -168,16 +231,19 @@ class PetConsultation(models.Model):
             'invoice_date': fields.Date.today(),
             'invoice_line_ids': invoice_lines,
             'currency_id': self.currency_id.id,
-            'invoice_origin': f"Consultation {self.reference}",
+            'invoice_origin': f"Consultation {self.consultation_ref}",
         }
+
         invoice = self.env['account.move'].create(invoice_vals)
 
         self.invoice_id = invoice.id
+
         if self.state == 'scheduled':
             self.state = 'completed'
+
         self.message_post(
-            body=f"Invoice {invoice.name} created for this consultation.",
-            subject="Invoice Creation"
+            body=_('Invoice <b>%s</b> created successfully.') % invoice.name,
+            subject=_('Invoice Created')
         )
 
         return {
@@ -188,3 +254,12 @@ class PetConsultation(models.Model):
             'view_mode': 'form',
             'target': 'current',
         }
+
+    def unlink(self):
+        for rec in self:
+            if rec.invoice_id:
+                raise ValidationError(
+                    _('You cannot delete a consultation that has an invoice.')
+                )
+        return super(PetConsultation, self).unlink()
+
