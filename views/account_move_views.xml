@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_account_move_form_inherit_vet_management" model="ir.ui.view">
+            <field name="name">account.move.form.inherit.vet.management</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_move_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//group[@id='header_left_group']" position="inside">
+                    <field name="pet_consultation_id" domain="[('state','=','completed')]"/>
+                    <field name="pet_id" domain="[('id','=',pet_consultation_id.pet_id)]" readonly="1"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
