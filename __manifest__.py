@@ -21,6 +21,7 @@
     ],
     'data': [
         # Security
+        'security/users.xml',
         'security/ir.model.access.csv',
 
         # sequences
