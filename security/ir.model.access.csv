@@ -6,6 +6,12 @@ access_res_partner_user,Partner User,base.model_res_partner,group_veterinary_use
 access_hr_employee_user,HR Employee User,veterinary_management.model_hr_employee,group_veterinary_user,1,0,1,0
 access_product_product_user,Product User,product.model_product_product,group_veterinary_user,1,0,1,0
 
+access_pet_species_vet,Pet Species Veterinarian,veterinary_management.model_pet_species,group_veterinarian,1,0,1,0
+access_pet_breed_vet,Pet Breed Veterinarian,veterinary_management.model_pet_breed,group_veterinarian,1,0,1,0
+access_pet_pet_vet,Pet Pet Veterinarian,veterinary_management.model_pet_pet,group_veterinarian,1,0,1,0
+access_res_partner_vet,Partner Veterinarian,base.model_res_partner,group_veterinarian,1,0,1,0
+access_hr_employee_vet,HR Employee Veterinarian,veterinary_management.model_hr_employee,group_veterinarian,1,0,1,0
+access_product_product_vet,Product Veterinarian,product.model_product_product,group_veterinarian,1,0,1,0
 access_pet_consultation_vet,Pet Consultation Veterinarian,veterinary_management.model_pet_consultation,group_veterinarian,1,1,1,0
 access_pet_treatment_vet,Pet Treatment Veterinarian,veterinary_management.model_pet_treatment,group_veterinarian,1,1,1,0
 
