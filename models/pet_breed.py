@@ -10,6 +10,11 @@ class PetBreed(models.Model):
         help ='Name of the breed, e.g., Labrador, Siamese'
     )
 
+    sequence = fields.Integer(
+        default=10,
+        help='Sequence for ordering breeds'
+    )
+
     description = fields.Char(
         help='Description of the breed'
     )
@@ -19,11 +24,6 @@ class PetBreed(models.Model):
         string='Species',
         required=True,
         help='The species to which this breed belongs'
-    )
-
-    active = fields.Boolean(
-        default=True,
-        help='Indicates whether the breed is active'
     )
 
     _unique_name = models.Constraint(

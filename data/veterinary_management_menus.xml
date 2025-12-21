@@ -38,8 +38,6 @@
         sequence="2"
     />
 
-
-
     <menuitem
         id="menu_hr_veterinarians"
         name="Veterinarians"
@@ -47,5 +45,30 @@
         action="veterinary_management.action_hr_employee_veterinarians"
         sequence="3"
     />
+
+    <menuitem
+        id="menu_products"
+        name="Products"
+        parent="veterinarian_menu_root"
+        sequence="4"
+    />
+
+    <menuitem
+        id="menu_veterinary_services"
+        name="Veterinary Services"
+        parent="menu_products"
+        action="veterinary_management.action_veterinary_services"
+        sequence="1"
+    />
+
+    <menuitem
+        id="menu_veterinary_medicaments"
+        name="Veterinary Medicaments"
+        parent="menu_products"
+        action="veterinary_management.action_veterinary_medicaments"
+        sequence="2"
+    />
+
+
 </odoo>
 

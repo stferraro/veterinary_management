@@ -28,6 +28,7 @@
         'data/sequence_consultation.xml',
 
         # Views
+        'views/product_actions.xml',
         'views/account_move_views.xml',
         'views/pet_consultation_views.xml',
         'views/pet_pet_views.xml',

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_veterinary_services" model="ir.actions.act_window">
+        <field name="name">Veterinary Services</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain">[('type', '=', 'veterinarian_service')]</field>
+        <field name="context">{'default_type': 'veterinarian_service'}</field>
+    </record>
+
+    <record id="action_veterinary_medicaments" model="ir.actions.act_window">
+        <field name="name">Veterinary Medicaments</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain">[('type', '=', 'veterinarian_medicament')]</field>
+        <field name="context">{'default_type': 'veterinarian_medicament'}</field>
+    </record>
+
+</odoo>
