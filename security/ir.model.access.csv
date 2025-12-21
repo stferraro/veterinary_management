@@ -1,6 +1,6 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_pet_species_user,Pet Species User,veterinary_management.model_pet_species,group_veterinary_user,1,0,1,0
-access_pet_breed_user,Pet Breed User,veterinary_management.model_pet_breed,group_veterinary_user,1,0,1,0
+access_pet_breed_user,Pet Breed User,veterinary_management.model_pet_breed,group_veterinary_user,1,1,1,0
 access_pet_pet_user,Pet Pet User,veterinary_management.model_pet_pet,group_veterinary_user,1,0,1,0
 access_res_partner_user,Partner User,base.model_res_partner,group_veterinary_user,1,0,1,0
 access_hr_employee_user,HR Employee User,veterinary_management.model_hr_employee,group_veterinary_user,1,0,1,0
