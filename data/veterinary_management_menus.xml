@@ -69,6 +69,13 @@
         sequence="2"
     />
 
+    <menuitem
+        id="menu_owner"
+        name="Owners"
+        parent="veterinarian_menu_root"
+        action="veterinary_management.action_menu_owner"
+        sequence="4"
+    />
 
 </odoo>
 
