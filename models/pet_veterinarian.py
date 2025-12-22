@@ -1,4 +1,4 @@
-from odoo import models, fields
+from odoo import models, fields, api
 
 
 class PetVeterinarian(models.Model):
@@ -7,6 +7,7 @@ class PetVeterinarian(models.Model):
 
     is_veterinarian = fields.Boolean(
         string='Is Veterinarian',
-        default=False,
+        default=True,
         help='Indicates whether the employee is a veterinarian'
     )
+

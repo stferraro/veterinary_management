@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-
         <record id="view_account_move_form_inherit_vet_management" model="ir.ui.view">
             <field name="name">account.move.form.inherit.vet.management</field>
             <field name="model">account.move</field>

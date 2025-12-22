@@ -14,6 +14,7 @@
     'depends': [
         'base',
         'contacts',
+        'sale',
         'stock',
         'account',
         'hr',
@@ -21,22 +22,26 @@
     ],
     'data': [
         # Security
+        'security/users.xml',
         'security/ir.model.access.csv',
 
         # sequences
         'data/sequence_consultation.xml',
 
         # Views
+        'views/product_actions.xml',
         'views/account_move_views.xml',
         'views/pet_consultation_views.xml',
         'views/pet_pet_views.xml',
         'views/pet_species_views.xml',
         'views/hr_employee_views.xml',
+        'views/res_partner_views.xml',
 
         # menus
         'data/veterinary_management_menus.xml',
         'views/hr_employee_views.xml',
-    ],
+
+],
     'installable': True,
     'application': True,
 }

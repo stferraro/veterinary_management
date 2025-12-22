@@ -1,6 +1,25 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_pet_consultation, veterinary_management.model_pet_consultation,model_pet_consultation,,1,1,1,1
-access_pet_treatment,veterinary_management.model_pet_treatment,model_pet_treatment,,1,1,1,1
-access_pet_pet,veterinary_management.model_pet_pet,model_pet_pet,,1,1,1,1
-access_pet_species,veterinary_management.model_pet_species,model_pet_species,,1,1,1,1
-access_pet_breed,veterinary_management.model_pet_breed,model_pet_breed,,1,1,1,1
+access_pet_species_user,Pet Species User,veterinary_management.model_pet_species,group_veterinary_user,1,0,1,0
+access_pet_breed_user,Pet Breed User,veterinary_management.model_pet_breed,group_veterinary_user,1,1,1,0
+access_pet_pet_user,Pet Pet User,veterinary_management.model_pet_pet,group_veterinary_user,1,0,1,0
+access_res_partner_user,Partner User,base.model_res_partner,group_veterinary_user,1,1,1,0
+access_hr_employee_user,HR Employee User,veterinary_management.model_hr_employee,group_veterinary_user,1,0,1,0
+access_product_product_user,Product User,product.model_product_product,group_veterinary_user,1,0,1,0
+
+access_pet_species_vet,Pet Species Veterinarian,veterinary_management.model_pet_species,group_veterinarian,1,1,1,1
+access_pet_breed_vet,Pet Breed Veterinarian,veterinary_management.model_pet_breed,group_veterinarian,1,1,1,1
+access_pet_pet_vet,Pet Pet Veterinarian,veterinary_management.model_pet_pet,group_veterinarian,1,1,1,1
+access_res_partner_vet,Partner Veterinarian,base.model_res_partner,group_veterinarian,1,0,1,0
+access_hr_employee_vet,HR Employee Veterinarian,veterinary_management.model_hr_employee,group_veterinarian,1,1,1,1
+access_product_product_vet,Product Veterinarian,product.model_product_product,group_veterinarian,1,1,1,1
+access_pet_consultation_vet,Pet Consultation Veterinarian,veterinary_management.model_pet_consultation,group_veterinarian,1,1,1,1
+access_pet_treatment_vet,Pet Treatment Veterinarian,veterinary_management.model_pet_treatment,group_veterinarian,1,1,1,1
+
+access_pet_species_admin,Pet Species Admin,veterinary_management.model_pet_species,group_veterinary_administrator,1,1,1,1
+access_pet_breed_admin,Pet Breed Admin,veterinary_management.model_pet_breed,group_veterinary_administrator,1,1,1,1
+access_pet_pet_admin,Pet Pet Admin,veterinary_management.model_pet_pet,group_veterinary_administrator,1,1,1,1
+access_pet_consultation_admin,Pet Consultation Admin,veterinary_management.model_pet_consultation,group_veterinary_administrator,1,1,1,1
+access_pet_treatment_admin,Pet Treatment Admin,veterinary_management.model_pet_treatment,group_veterinary_administrator,1,1,1,1
+access_res_partner_admin,Partner Admin,base.model_res_partner,group_veterinary_administrator,1,1,1,1
+access_hr_employee_admin,HR Employee Admin,veterinary_management.model_hr_employee,group_veterinary_administrator,1,1,1,1
+access_product_product_admin,Product Admin,product.model_product_product,group_veterinary_administrator,1,1,1,1

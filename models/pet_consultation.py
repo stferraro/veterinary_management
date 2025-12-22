@@ -20,6 +20,7 @@ class PetConsultation(models.Model):
         copy=False,
         default=lambda self: _('New'),
         required=True,
+        string='Consultation',
         states={'scheduled': [('readonly', False)]}
     )
 

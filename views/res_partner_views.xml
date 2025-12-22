@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+         <record id="view_res_partner_form_inherit_vet_management" model="ir.ui.view">
+            <field name="name">res.partner.form.inherit.vet.management</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                 <xpath expr="//notebook/page[@name='contact_addresses']" position="after">
+                    <page string="Pets">
+                        <field name="pets_ids">
+                            <list>
+                                <field name="name"/>
+                                <field name="species_id"/>
+                                <field name="age"/>
+                                <field name="gender"/>
+                                <field name="color" optional="hide"/>
+                                <field name="weight" optional="hide"/>
+                            </list>
+                        </field>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_res_partner_inherit_vet_button" model="ir.ui.view">
+            <field name="name">res.partner.inherit.vet.button</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="sale.res_partner_view_buttons"/>
+            <field name="arch" type="xml">
+                <xpath expr="//button[@name='sale.act_res_partner_2_sale_order']" position="after">
+                    <button
+                        name="action_view_pets"
+                        string="View Pets"
+                        type="object"
+                        icon="fa-paw"
+                        class="oe_stat_button"
+                        invisible="pets_count == 0">
+                        <field
+                            name="pets_count"
+                            widget="statinfo"
+                            class="oe_stat_info"
+                            string="Pets"
+                        />
+                    </button>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="action_menu_owner" model="ir.actions.act_window">
+            <field name="name">Owners</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_mode">list,form,kanban</field>
+            <field name="domain">[('pets_ids','!=',False)]</field>
+        </record>
+
+    </data>
+</odoo>

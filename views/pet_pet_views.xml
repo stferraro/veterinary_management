@@ -28,6 +28,8 @@
             <field name="arch" type="xml">
                 <form string="Pet">
                     <sheet>
+
+
                         <div class="d-flex gap-3 mb8">
                             <field name="image" widget="image" options="{'preview_image': 'image', 'size': [130,130], 'img_class': 'rounded border'}"/>
                                 <div class="flex-grow-1">
@@ -70,6 +72,16 @@
                               <field name="weight"/>
                               <field name="color"/>
                             </group>
+                          </page>
+                          <page string="Consultations" groups="veterinary_management.group_veterinarian">
+                            <field name="consultations_ids">
+                                <list>
+                                    <field name="consultation_ref"/>
+                                    <field name="date"/>
+                                    <field name="veterinarian_id"/>
+                                    <field name="state"/>
+                                </list>
+                            </field>
                           </page>
                         </notebook>
 
