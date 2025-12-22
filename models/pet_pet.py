@@ -69,6 +69,19 @@ class PetPet(models.Model):
         help='The veterinarian assigned to the pet animal'
     )
 
+    consultations_ids = fields.One2many(
+        comodel_name='pet.consultation',
+        inverse_name='pet_id',
+        string='Consultations',
+        help='Consultations related to the pet animal'
+    )
+
+    consultations_count = fields.Integer(
+        string='Number of Consultations',
+        compute='_compute_consultations_count',
+        help='Total number of consultations for the pet animal'
+    )
+
     def _compute_age(self):
         for rec in self:
             if rec.birth_date:
@@ -84,3 +97,7 @@ class PetPet(models.Model):
         for rec in self:
             if rec.birth_date and rec.birth_date > fields.Date.today():
                 raise ValidationError(_('The birth date cannot be in the future.'))
+
+    def _compute_consultations_count(self):
+        for rec in self:
+            rec.consultations_count = len(rec.consultations_ids)
